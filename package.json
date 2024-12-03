@@ -16,7 +16,8 @@
     "express-rate-limit": "^7.4.1",
     "express-validator": "^7.2.0",
     "helmet": "^8.0.0",
-    "openai": "^4.74.0"
+    "openai": "^4.74.0",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
