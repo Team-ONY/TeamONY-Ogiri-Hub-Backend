@@ -1,11 +1,15 @@
 import OpenAI from 'openai';
 import env from '../config/env';
 
-const openai = new OpenAI({
-  apiKey: env.OPENAI_API_KEY,
-});
+export const createOpenAIClient = () => {
+  return new OpenAI({
+    apiKey: env.OPENAI_API_KEY,
+  });
+};
 
 export const generateImage = async (prompt: string): Promise<string> => {
+  const openai = createOpenAIClient();
+
   const safePrompt = `Create a photorealistic image: 
     ${prompt}
     Style: High-quality photography, detailed, realistic lighting, natural colors.
