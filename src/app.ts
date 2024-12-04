@@ -9,12 +9,26 @@ import env from './config/env';
 const app = express();
 const port = process.env.PORT || 3001;
 
-// ミドルウェアの設定
+const allowedOrigins = {
+  development: ['http://localhost:5173', 'http://localhost:4173'],
+  production: ['https://your-production-domain.com'],
+};
+
+const currentOrigins =
+  process.env.NODE_ENV === 'production' ? allowedOrigins.production : allowedOrigins.development;
+
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:5173', // フロントエンドのURL
+    origin: (origin, callback) => {
+      if (!origin || currentOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     methods: ['POST'],
     allowedHeaders: ['Content-Type', 'x-api-key'],
+    credentials: true,
   })
 );
 app.use(helmet());
