@@ -13,6 +13,9 @@ export const generateImage = async (prompt: string): Promise<string> => {
   try {
     const openai = createOpenAIClient();
 
+    // リクエスト前に少し待機
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
     const response = await openai.images.generate({
       model: 'dall-e-3',
       prompt: prompt,
@@ -26,6 +29,9 @@ export const generateImage = async (prompt: string): Promise<string> => {
       throw new Error('画像URLの生成に失敗しました');
     }
 
+    // レスポンス後に少し待機
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
     return response.data[0].url;
   } catch (err) {
     const error = err as Error & {
@@ -33,12 +39,21 @@ export const generateImage = async (prompt: string): Promise<string> => {
       status?: number;
     };
 
+    // より詳細なエラーメッセージを追加
     console.error('OpenAI API Error Details:', {
       error,
       message: error.message,
       type: error.type,
       status: error.status,
     });
+
+    // エラーメッセージをより具体的に
+    if (error.status === 429) {
+      throw new Error('リクエストが多すぎます。しばらく待ってから再度お試しください。');
+    } else if (error.status === 500) {
+      throw new Error('OpenAI APIでエラーが発生しました。しばらく待ってから再度お試しください。');
+    }
+
     throw error;
   }
 };
