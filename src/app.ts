@@ -9,18 +9,21 @@ import env from './config/env';
 const app = express();
 const port = process.env.PORT || 3001;
 
-const allowedOrigins = {
-  development: ['http://localhost:5173', 'http://localhost:4173'],
-  production: ['https://your-production-domain.com'],
-};
+// 許可するオリジンのリスト
+const allowedOrigins = [
+  'http://localhost:5173', // 開発環境
+  'http://localhost:4173', // プレビュー環境
+  'https://your-production-domain.com', // 本番環境のドメイン
+];
 
-const currentOrigins =
-  process.env.NODE_ENV === 'production' ? allowedOrigins.production : allowedOrigins.development;
-
+// CORSの設定
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || currentOrigins.includes(origin)) {
+      // originがundefinedの場合（例：Postmanからのリクエスト）は許可
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
         callback(new Error('Not allowed by CORS'));
@@ -28,7 +31,6 @@ app.use(
     },
     methods: ['POST'],
     allowedHeaders: ['Content-Type', 'x-api-key'],
-    credentials: true,
   })
 );
 app.use(helmet());
