@@ -7,17 +7,14 @@ import { validateApiKey } from './middleware/auth';
 import env from './config/env';
 
 const app = express();
-const port = env.PORT;
+const port = process.env.PORT || 3001;
 
 // ミドルウェアの設定
 app.use(
   cors({
-    origin: 'http://localhost:5173', // フロントエンドのURL
+    origin: process.env.FRONTEND_URL || 'http://localhost:5173', // フロントエンドのURL
     methods: ['POST'],
-    allowedHeaders: [
-      'Content-Type',
-      'x-api-key', // x-api-keyヘッダーを許可
-    ],
+    allowedHeaders: ['Content-Type', 'x-api-key'],
   })
 );
 app.use(helmet());
@@ -29,6 +26,10 @@ const limiter = rateLimit({
   max: 100,
 });
 app.use(limiter);
+
+app.get('/health', (_, res) => {
+  res.status(200).json({ status: 'OK' });
+});
 
 // ルートの設定
 app.use('/api/image', validateApiKey, imageRoutes);
