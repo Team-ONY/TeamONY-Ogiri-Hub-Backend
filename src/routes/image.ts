@@ -1,33 +1,24 @@
-import express from 'express';
-import { body, validationResult } from 'express-validator';
+import { Hono } from 'hono';
+import { zValidator } from '@hono/zod-validator';
+import { z } from 'zod';
 import { generateImage } from '../services/openai';
-import type { ImageGenerationRequest, ImageGenerationResponse, ErrorResponse } from '../types';
+import type { ImageGenerationRequest } from '../types';
 
-const router = express.Router();
+const app = new Hono();
 
-router.post(
-  '/generate',
-  [body('prompt').notEmpty().withMessage('プロンプトは必須です')],
-  async (
-    req: express.Request<{}, {}, ImageGenerationRequest>,
-    res: express.Response<ImageGenerationResponse | ErrorResponse>
-  ) => {
-    try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        res.status(400).json({ error: errors.array()[0].msg });
-        return;
-      }
+const schema = z.object({
+  prompt: z.string().min(1, 'プロンプトは必須です'),
+});
 
-      const { prompt } = req.body;
-      const imageUrl = await generateImage(prompt);
-
-      res.json({ imageUrl });
-    } catch (error) {
-      console.error('画像生成エラー:', error);
-      res.status(500).json({ error: '画像生成に失敗しました' });
-    }
+app.post('/generate', zValidator('json', schema), async (c) => {
+  try {
+    const { prompt } = await c.req.valid('json');
+    const imageUrl = await generateImage(prompt);
+    return c.json({ imageUrl });
+  } catch (error) {
+    console.error('画像生成エラー:', error);
+    return c.json({ error: '画像生成に失敗しました' }, 500);
   }
-);
+});
 
-export default router;
+export { app as imageRoutes };
