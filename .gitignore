@@ -20,7 +20,6 @@ build/
 *.swo
 .DS_Store
 .env.development
-.env.test
 .env.production
 
 # TypeScript
