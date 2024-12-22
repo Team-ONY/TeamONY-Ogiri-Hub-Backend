@@ -26,6 +26,13 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Create env file
+        run: |
+          echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env.test
+          echo "API_KEY=${{ secrets.API_KEY }}" >> .env.test
+          echo "NODE_ENV=test" >> .env.test
+          echo "PORT=3001" >> .env.test
+
       - name: Lint
         run: npm run lint
 
