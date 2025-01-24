@@ -1,0 +1,22 @@
+coverage:
+  status:
+    project:
+      default:
+        target: 90% # カバレッジの目標値
+        threshold: 1% # 許容される変動幅
+    patch:
+      default:
+        target: 90% # 新規コードのカバレッジ目標値
+        threshold: 1% # 許容される変動幅
+
+comment:
+  layout: 'reach, diff, flags, files'
+  behavior: default
+  require_changes: false # PRに変更がなくてもコメントする
+  require_base: false
+  require_head: true
+  show_carryforward_flags: true
+
+ignore:
+  - 'src/**/*.test.ts' # テストファイルは除外
+  - 'src/__tests__/**/*' # テストディレクトリ全体を除外
